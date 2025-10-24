@@ -70,7 +70,7 @@ button:hover { background:var(--btn-hover); transform:translateY(-3px); }
 
 <script>
 let lang='en', userName='', currentOperation='', correctAnswer={}, hiddenSlots=[];
-const arabicDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+const arabicDigits=['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
 function toArabicDigit(n){ return n.toString().replace(/\d/g,d=>arabicDigits[d]); }
 
 const texts={
@@ -94,7 +94,7 @@ function goToOperations(){
   document.getElementById('operationPage').classList.remove('hidden');
   document.getElementById('greeting').innerText=texts[lang].greeting(userName);
   document.getElementById('operationPrompt').innerText=texts[lang].chooseOperation;
-  document.getElementById('btnAdd').innerText='➕ '+texts[lang].operationNames["+"]; 
+  document.getElementById('btnAdd').innerText='➕ '+texts[lang].operationNames["+"];
   document.getElementById('btnSub').innerText='➖ '+texts[lang].operationNames["-"];
   document.getElementById('btnMul').innerText='✖ '+texts[lang].operationNames["*"];
   document.getElementById('btnDiv').innerText='➗ '+texts[lang].operationNames["/"];
@@ -108,10 +108,16 @@ function chooseOperation(op){
   generateQuestion();
 }
 
+// ✅ FIXED generateQuestion — guarantees at least one drop zone
 function generateQuestion(){
   let num1=Math.floor(Math.random()*50)+10;
   let num2=Math.floor(Math.random()*50)+10;
-  if(currentOperation==="/"){ num2=Math.floor(Math.random()*9)+1; let answer=Math.floor(Math.random()*10); num1=num2*answer; }  
+  if(currentOperation==="/"){
+    num2=Math.floor(Math.random()*9)+1;
+    let answer=Math.floor(Math.random()*10);
+    num1=num2*answer;
+  }
+
   let answer;
   switch(currentOperation){
     case "+": answer=num1+num2; break;
@@ -119,18 +125,28 @@ function generateQuestion(){
     case "*": answer=num1*num2; break;
     case "/": answer=num1/num2; break;
   }
+
   correctAnswer={num1,num2,answer};
   hiddenSlots=[];
 
   const buildRow=(num,part)=>{
     let digits=num.toString().split("");
-    return digits.map(d=>{
-      if(Math.random()<0.3){ hiddenSlots.push({part,digit:d}); return `<span class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)"></span>`; }
+    let hiddenIndexes=[];
+    digits.forEach((d,i)=>{ if(Math.random()<0.3) hiddenIndexes.push(i); });
+    // ✅ Ensure at least one digit hidden
+    if(hiddenIndexes.length===0){
+      hiddenIndexes.push(Math.floor(Math.random()*digits.length));
+    }
+    return digits.map((d,i)=>{
+      if(hiddenIndexes.includes(i)){
+        hiddenSlots.push({part,digit:d});
+        return `<span class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)"></span>`;
+      }
       return `<span>${lang==='ar'?toArabicDigit(d):d}</span>`;
     }).join('');
   };
 
-  const directionStyle = lang==='ar' ? 'direction:ltr;' : '';
+  const directionStyle=lang==='ar'?'direction:ltr;':'';
 
   document.getElementById('question').innerHTML=
     `<div style="${directionStyle}">${buildRow(num1,'num1')}</div>
@@ -139,7 +155,10 @@ function generateQuestion(){
      <div style="${directionStyle}">${buildRow(answer,'answer')}</div>`;
 
   document.getElementById('dragItems').innerHTML=hiddenSlots.map((s,i)=>
-    `<div class="drag-item" draggable="true" ondragstart="drag(event)" id="drag${i}">${lang==='ar'?toArabicDigit(s.digit):s.digit}</div>`).sort(()=>Math.random()-0.5).join('');
+    `<div class="drag-item" draggable="true" ondragstart="drag(event)" id="drag${i}">
+      ${lang==='ar'?toArabicDigit(s.digit):s.digit}
+    </div>`
+  ).sort(()=>Math.random()-0.5).join('');
 
   document.getElementById('submitBtn').innerText=texts[lang].submit;
   document.getElementById('tryBtn').innerText=texts[lang].tryAnother;
@@ -155,8 +174,8 @@ function drop(ev){ ev.preventDefault(); const data=ev.dataTransfer.getData("text
 
 function checkAnswer(){
   document.querySelectorAll('.drop-zone').forEach((d,i)=>{
-    let expected = lang==='ar'? toArabicDigit(hiddenSlots[i].digit):hiddenSlots[i].digit;
-    let actual = d.textContent.trim();
+    let expected=lang==='ar'?toArabicDigit(hiddenSlots[i].digit):hiddenSlots[i].digit;
+    let actual=d.textContent.trim();
     d.classList.add(actual===expected?'correct':'wrong');
   });
   document.getElementById('resultButtons').classList.remove('hidden');
@@ -170,7 +189,7 @@ function viewAnswer(){
   const n1=lang==='ar'?toArabicDigit(num1):num1;
   const n2=lang==='ar'?toArabicDigit(num2):num2;
   const ans=lang==='ar'?toArabicDigit(answer):answer;
-  const directionStyle = lang==='ar' ? 'direction:ltr;' : '';
+  const directionStyle=lang==='ar'?'direction:ltr;':'';
   document.getElementById('question').innerHTML=
     `<div style="${directionStyle}">${n1}</div>
      <div style="${directionStyle}">${currentOperation} ${n2}</div>
