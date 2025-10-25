@@ -1,182 +1,468 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Math Game</title>
-<style>
-:root { --primary:#ff69b4; --bg:#ffe6f0; --btn-hover:#ff85c1; }
-body { font-family:"Poppins",sans-serif; background:var(--bg); display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
-.container { text-align:center; background:white; padding:40px 30px; border-radius:25px; box-shadow:0 10px 30px rgba(255,105,180,0.3); width:90%; max-width:450px; }
-h1,h2 { color:#333; margin-bottom:15px; }
-input { padding:10px; border-radius:10px; border:2px solid var(--primary); width:80%; outline:none; font-size:16px; }
-button { background:var(--primary); color:white; border:none; border-radius:12px; padding:12px 20px; margin:10px; cursor:pointer; font-size:16px; transition:transform 0.2s, background 0.3s; }
-button:hover { background:var(--btn-hover); transform:translateY(-3px); }
-.hidden { display:none; }
-.drag-container { display:flex; justify-content:center; align-items:flex-start; margin-top:20px; flex-wrap:wrap; }
-.hand { background:#ffe0eb; padding:10px; border-radius:15px; margin:5px; min-width:80px; display:flex; flex-wrap:wrap; justify-content:center; }
-.drag-item { background:#ffb3d1; padding:10px 12px; margin:5px; border-radius:10px; cursor:grab; font-weight:bold; font-size:18px; color:#333; border:2px solid var(--primary); transition:transform 0.2s; }
-.drag-item:active { transform:scale(1.1); }
-.drop-zone { display:inline-block; width:35px; height:35px; border-bottom:3px solid #555; text-align:center; font-size:22px; font-weight:bold; margin:0 3px; border-radius:6px; }
-.drop-zone.correct { background-color:#bdfcc9; border-color:#28a745; }
-.drop-zone.wrong { background-color:#ffb3b3; border-color:#dc3545; }
-.vertical-equation { display:inline-block; font-size:24px; line-height:1.8em; margin:15px 0; text-align:right; }
-.operation-line { border-top:2px solid #333; width:100%; margin:4px 0; }
-.result-buttons { margin-top:20px; }
-</style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Math Game</title>
+    <style>
+      :root {
+        --primary: #ff69b4;
+        --bg: #ffe6f0;
+        --btn-hover: #ff85c1;
+      }
+      body {
+        font-family: "Poppins", sans-serif;
+        background: var(--bg);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .container {
+        text-align: center;
+        background: white;
+        padding: 40px 30px;
+        border-radius: 25px;
+        box-shadow: 0 10px 30px rgba(255, 105, 180, 0.3);
+        width: 90%;
+        max-width: 450px;
+      }
+      h1,
+      h2 {
+        color: #333;
+        margin-bottom: 15px;
+      }
+      input {
+        padding: 10px;
+        border-radius: 10px;
+        border: 2px solid var(--primary);
+        width: 80%;
+        outline: none;
+        font-size: 16px;
+      }
+      button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 20px;
+        margin: 10px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: transform 0.2s, background 0.3s;
+      }
+      button:hover {
+        background: var(--btn-hover);
+        transform: translateY(-3px);
+      }
+      .hidden {
+        display: none;
+      }
+      .drag-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+      .hand {
+        background: #ffe0eb;
+        padding: 10px;
+        border-radius: 15px;
+        margin: 5px;
+        min-width: 80px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .drag-item {
+        background: #ffb3d1;
+        padding: 10px 12px;
+        margin: 5px;
+        border-radius: 10px;
+        cursor: grab;
+        font-weight: bold;
+        font-size: 18px;
+        color: #333;
+        border: 2px solid var(--primary);
+        transition: transform 0.2s;
+      }
+      .drag-item:active {
+        transform: scale(1.1);
+      }
+      .drop-zone {
+        display: inline-block;
+        width: 35px;
+        height: 35px;
+        border-bottom: 3px solid #555;
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+        margin: 0 3px;
+        border-radius: 6px;
+      }
+      .drop-zone.correct {
+        background-color: #bdfcc9;
+        border-color: #28a745;
+      }
+      .drop-zone.wrong {
+        background-color: #ffb3b3;
+        border-color: #dc3545;
+      }
+      .vertical-equation {
+        display: inline-block;
+        font-size: 24px;
+        line-height: 1.8em;
+        margin: 15px 0;
+        text-align: right;
+      }
+      .operation-line {
+        border-top: 2px solid #333;
+        width: 100%;
+        margin: 4px 0;
+      }
+      .result-buttons {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Language Selection -->
+    <div class="container" id="startPage">
+      <h1>🎓 Welcome to the Math Game!</h1>
+      <p>Select your language / اختر لغتك:</p>
+      <button onclick="setLanguage('en')">English</button>
+      <button onclick="setLanguage('ar')">العربية</button>
+    </div>
 
-<!-- Language Selection -->
-<div class="container" id="startPage">
-  <h1>🎓 Welcome to the Math Game!</h1>
-  <p>Select your language / اختر لغتك:</p>
-  <button onclick="setLanguage('en')">English</button>
-  <button onclick="setLanguage('ar')">العربية</button>
-</div>
+    <!-- Name Page -->
+    <div class="container hidden" id="namePage">
+      <p id="namePrompt"></p>
+      <input type="text" id="userName" />
+      <br /><br />
+      <button onclick="goToOperations()" id="startBtn"></button>
+    </div>
 
-<!-- Name Page -->
-<div class="container hidden" id="namePage">
-  <p id="namePrompt"></p>
-  <input type="text" id="userName">
-  <br><br>
-  <button onclick="goToOperations()" id="startBtn"></button>
-</div>
+    <!-- Operation Selection Page -->
+    <div class="container hidden" id="operationPage">
+      <h2 id="greeting"></h2>
+      <p id="operationPrompt"></p>
+      <button onclick="chooseOperation('+')" id="btnAdd"></button>
+      <button onclick="chooseOperation('-')" id="btnSub"></button>
+      <button onclick="chooseOperation('*')" id="btnMul"></button>
+      <button onclick="chooseOperation('/')" id="btnDiv"></button>
+    </div>
 
-<!-- Operation Selection Page -->
-<div class="container hidden" id="operationPage">
-  <h2 id="greeting"></h2>
-  <p id="operationPrompt"></p>
-  <button onclick="chooseOperation('+')" id="btnAdd"></button>
-  <button onclick="chooseOperation('-')" id="btnSub"></button>
-  <button onclick="chooseOperation('*')" id="btnMul"></button>
-  <button onclick="chooseOperation('/')" id="btnDiv"></button>
-</div>
+    <!-- Game Page -->
+    <div class="container hidden" id="gamePage">
+      <h2 id="operationTitle"></h2>
+      <div class="drag-container">
+        <div class="hand" id="dragItems"></div>
+        <div id="question" class="vertical-equation"></div>
+      </div>
+      <button id="submitBtn" onclick="checkAnswer()"></button>
+      <div class="result-buttons hidden" id="resultButtons">
+        <button onclick="tryAgain()" id="tryBtn"></button>
+        <button onclick="goHome()" id="homeBtn"></button>
+        <button id="viewAnswerBtn" onclick="viewAnswer()"></button>
+      </div>
+    </div>
 
-<!-- Game Page -->
-<div class="container hidden" id="gamePage">
-  <h2 id="operationTitle"></h2>
-  <div class="drag-container">
-    <div class="hand" id="dragItems"></div>
-    <div id="question" class="vertical-equation"></div>
-  </div>
-  <button id="submitBtn" onclick="checkAnswer()"></button>
-  <div class="result-buttons hidden" id="resultButtons">
-    <button onclick="tryAgain()" id="tryBtn"></button>
-    <button onclick="goHome()" id="homeBtn"></button>
-    <button id="viewAnswerBtn" onclick="viewAnswer()"></button>
-  </div>
-</div>
+    <script>
+      let lang = "en",
+        userName = "",
+        currentOperation = "",
+        correctAnswer = {},
+        hiddenSlots = [];
+      const arabicDigits = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+      function toArabicDigit(n) {
+        return n.toString().replace(/\d/g, (d) => arabicDigits[d]);
+      }
 
-<script>
-let lang='en', userName='', currentOperation='', correctAnswer={}, hiddenSlots=[];
-const arabicDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
-function toArabicDigit(n){ return n.toString().replace(/\d/g,d=>arabicDigits[d]); }
+      const texts = {
+        en: {
+          enterName: "Enter your name to begin:",
+          start: "Start",
+          greeting: (n) =>
+            `Hi ${n} 💕, please choose the type of math operation`,
+          chooseOperation: "Choose the type of math operation:",
+          operationNames: {
+            "+": "Addition",
+            "-": "Subtraction",
+            "*": "Multiplication",
+            "/": "Division",
+          },
+          alertName: "Please enter your name first 💡",
+          submit: "✅ Submit",
+          tryAnother: "🔁 Next Question",
+          home: "🏠 Home",
+          viewAnswer: "👀 View Answer",
+        },
+        ar: {
+          enterName: "أدخل اسمك للبدء:",
+          start: "ابدأ",
+          greeting: (n) => `مرحباً ${n} 💕، اختر نوع العملية الحسابية`,
+          chooseOperation: "اختر نوع العملية الحسابية:",
+          operationNames: { "+": "جمع", "-": "طرح", "*": "ضرب", "/": "قسمة" },
+          alertName: "الرجاء إدخال اسمك أولاً 💡",
+          submit: "✅ تحقق",
+          tryAnother: "🔁 السؤال التالي",
+          home: "🏠 الرئيسية",
+          viewAnswer: "👀 عرض الإجابة",
+        },
+      };
 
-const texts={
-  en:{ enterName:'Enter your name to begin:', start:'Start', greeting:n=>`Hi ${n} 💕, please choose the type of math operation`, chooseOperation:'Choose the type of math operation:', operationNames:{"+":"Addition","-":"Subtraction","*":"Multiplication","/":"Division"}, alertName:'Please enter your name first 💡', submit:'✅ Submit', tryAnother:'🔁 Try Another', home:'🏠 Home', viewAnswer:'👀 View Answer' },
-  ar:{ enterName:'أدخل اسمك للبدء:', start:'ابدأ', greeting:n=>`مرحباً ${n} 💕، اختر نوع العملية الحسابية`, chooseOperation:'اختر نوع العملية الحسابية:', operationNames:{"+":"جمع","-":"طرح","*":"ضرب","/":"قسمة"}, alertName:'الرجاء إدخال اسمك أولاً 💡', submit:'✅ تحقق', tryAnother:'🔁 حاول مرة أخرى', home:'🏠 الرئيسية', viewAnswer:'👀 عرض الإجابة' }
-};
+      function setLanguage(selected) {
+        lang = selected;
+        document.getElementById("startPage").classList.add("hidden");
+        document.getElementById("namePage").classList.remove("hidden");
+        document.body.dir = lang === "ar" ? "rtl" : "ltr";
+        document.getElementById("namePrompt").innerText = texts[lang].enterName;
+        document.getElementById("startBtn").innerText = texts[lang].start;
+      }
 
-function setLanguage(selected){
-  lang=selected;
-  document.getElementById('startPage').classList.add('hidden');
-  document.getElementById('namePage').classList.remove('hidden');
-  document.body.dir=(lang==='ar')?'rtl':'ltr';
-  document.getElementById('namePrompt').innerText=texts[lang].enterName;
-  document.getElementById('startBtn').innerText=texts[lang].start;
-}
+      function goToOperations() {
+        userName = document.getElementById("userName").value.trim();
+        if (!userName) return alert(texts[lang].alertName);
+        document.getElementById("namePage").classList.add("hidden");
+        document.getElementById("operationPage").classList.remove("hidden");
+        document.getElementById("greeting").innerText =
+          texts[lang].greeting(userName);
+        document.getElementById("operationPrompt").innerText =
+          texts[lang].chooseOperation;
+        document.getElementById("btnAdd").innerText =
+          "➕ " + texts[lang].operationNames["+"];
+        document.getElementById("btnSub").innerText =
+          "➖ " + texts[lang].operationNames["-"];
+        document.getElementById("btnMul").innerText =
+          "✖ " + texts[lang].operationNames["*"];
+        document.getElementById("btnDiv").innerText =
+          "➗ " + texts[lang].operationNames["/"];
+      }
 
-function goToOperations(){
-  userName=document.getElementById('userName').value.trim();
-  if(!userName) return alert(texts[lang].alertName);
-  document.getElementById('namePage').classList.add('hidden');
-  document.getElementById('operationPage').classList.remove('hidden');
-  document.getElementById('greeting').innerText=texts[lang].greeting(userName);
-  document.getElementById('operationPrompt').innerText=texts[lang].chooseOperation;
-  document.getElementById('btnAdd').innerText='➕ '+texts[lang].operationNames["+"]; 
-  document.getElementById('btnSub').innerText='➖ '+texts[lang].operationNames["-"];
-  document.getElementById('btnMul').innerText='✖ '+texts[lang].operationNames["*"];
-  document.getElementById('btnDiv').innerText='➗ '+texts[lang].operationNames["/"];
-}
+      function chooseOperation(op) {
+        currentOperation = op;
+        document.getElementById("operationPage").classList.add("hidden");
+        document.getElementById("gamePage").classList.remove("hidden");
+        document.getElementById("operationTitle").innerText =
+          texts[lang].operationNames[op];
+        generateQuestion();
+      }
 
-function chooseOperation(op){
-  currentOperation=op;
-  document.getElementById('operationPage').classList.add('hidden');
-  document.getElementById('gamePage').classList.remove('hidden');
-  document.getElementById('operationTitle').innerText=texts[lang].operationNames[op];
-  generateQuestion();
-}
+      function generateQuestion() {
+        let num1 = Math.floor(Math.random() * 50) + 10;
+        let num2 = Math.floor(Math.random() * 50) + 10;
 
-function generateQuestion(){
-  let num1=Math.floor(Math.random()*50)+10;
-  let num2=Math.floor(Math.random()*50)+10;
-  if(currentOperation==="/"){ num2=Math.floor(Math.random()*9)+1; let answer=Math.floor(Math.random()*10); num1=num2*answer; }  
-  let answer;
-  switch(currentOperation){
-    case "+": answer=num1+num2; break;
-    case "-": answer=num1-num2; break;
-    case "*": answer=num1*num2; break;
-    case "/": answer=num1/num2; break;
-  }
-  correctAnswer={num1,num2,answer};
-  hiddenSlots=[];
+        if (currentOperation === "/") {
+          num2 = Math.floor(Math.random() * 9) + 1;
+          let answer = Math.floor(Math.random() * 10);
+          num1 = num2 * answer;
+        }
 
-  const buildRow=(num,part)=>{
-    let digits=num.toString().split("");
-    return digits.map(d=>{
-      if(Math.random()<0.3){ hiddenSlots.push({part,digit:d}); return `<span class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)"></span>`; }
-      return `<span>${lang==='ar'?toArabicDigit(d):d}</span>`;
-    }).join('');
-  };
+        let answer;
+        switch (currentOperation) {
+          case "+":
+            answer = num1 + num2;
+            break;
+          case "-":
+            answer = num1 - num2;
+            break;
+          case "*":
+            answer = num1 * num2;
+            break;
+          case "/":
+            answer = num1 / num2;
+            break;
+        }
 
-  const directionStyle = lang==='ar' ? 'direction:ltr;' : '';
+        correctAnswer = { num1, num2, answer };
+        hiddenSlots = [];
+        let hideCount = 0;
 
-  document.getElementById('question').innerHTML=
-    `<div style="${directionStyle}">${buildRow(num1,'num1')}</div>
-     <div style="${directionStyle}">${currentOperation} ${buildRow(num2,'num2')}</div>
-     <div class="operation-line"></div>
-     <div style="${directionStyle}">${buildRow(answer,'answer')}</div>`;
+        // Decide how many digits to hide overall (2–4)
+        const minHide = 2;
+        const maxHide = 4;
+        let totalToHide =
+          Math.floor(Math.random() * (maxHide - minHide + 1)) + minHide;
 
-  document.getElementById('dragItems').innerHTML=hiddenSlots.map((s,i)=>
-    `<div class="drag-item" draggable="true" ondragstart="drag(event)" id="drag${i}">${lang==='ar'?toArabicDigit(s.digit):s.digit}</div>`).sort(()=>Math.random()-0.5).join('');
+        // Build row with at least one hidden digit
+        const buildRow = (num, part) => {
+          let digits = num.toString().split("");
+          let hiddenThisRow = 0;
 
-  document.getElementById('submitBtn').innerText=texts[lang].submit;
-  document.getElementById('tryBtn').innerText=texts[lang].tryAnother;
-  document.getElementById('homeBtn').innerText=texts[lang].home;
-  document.getElementById('viewAnswerBtn').innerText=texts[lang].viewAnswer;
-  document.getElementById('resultButtons').classList.add('hidden');
-  document.getElementById('submitBtn').classList.remove('hidden');
-}
+          return digits
+            .map((d) => {
+              // Always hide at least one digit per number
+              const mustHide = hiddenThisRow === 0;
+              const canHide =
+                hideCount < totalToHide && (Math.random() < 0.4 || mustHide);
+              if (canHide) {
+                hiddenSlots.push({ part, digit: d });
+                hideCount++;
+                hiddenThisRow++;
+                return `<span class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)"></span>`;
+              }
+              return `<span>${lang === "ar" ? toArabicDigit(d) : d}</span>`;
+            })
+            .join("");
+        };
 
-function allowDrop(ev){ ev.preventDefault(); }
-function drag(ev){ ev.dataTransfer.setData("text", ev.target.id); }
-function drop(ev){ ev.preventDefault(); const data=ev.dataTransfer.getData("text"); ev.target.textContent=document.getElementById(data).textContent; }
+        let row1 = buildRow(num1, "num1");
+        let row2 = buildRow(num2, "num2");
+        let row3 = buildRow(answer, "answer");
 
-function checkAnswer(){
-  document.querySelectorAll('.drop-zone').forEach((d,i)=>{
-    let expected = lang==='ar'? toArabicDigit(hiddenSlots[i].digit):hiddenSlots[i].digit;
-    let actual = d.textContent.trim();
-    d.classList.add(actual===expected?'correct':'wrong');
-  });
-  document.getElementById('resultButtons').classList.remove('hidden');
-  document.getElementById('submitBtn').classList.add('hidden');
-}
+        const directionStyle = lang === "ar" ? "direction:ltr;" : "";
 
-function tryAgain(){ generateQuestion(); }
-function goHome(){ document.getElementById('gamePage').classList.add('hidden'); document.getElementById('operationPage').classList.remove('hidden'); }
-function viewAnswer(){
-  const {num1,num2,answer}=correctAnswer;
-  const n1=lang==='ar'?toArabicDigit(num1):num1;
-  const n2=lang==='ar'?toArabicDigit(num2):num2;
-  const ans=lang==='ar'?toArabicDigit(answer):answer;
-  const directionStyle = lang==='ar' ? 'direction:ltr;' : '';
-  document.getElementById('question').innerHTML=
-    `<div style="${directionStyle}">${n1}</div>
+        document.getElementById("question").innerHTML = `
+    <div style="${directionStyle}">${row1}</div>
+    <div style="${directionStyle}">${currentOperation} ${row2}</div>
+    <div class="operation-line"></div>
+    <div style="${directionStyle}">${row3}</div>
+  `;
+
+        // Only create draggable items equal to hiddenSlots
+        document.getElementById("dragItems").innerHTML = hiddenSlots
+          .map(
+            (s, i) =>
+              `<div class="drag-item" draggable="true" ondragstart="drag(event)" id="drag${i}">
+          ${lang === "ar" ? toArabicDigit(s.digit) : s.digit}
+       </div>`
+          )
+          .sort(() => Math.random() - 0.5)
+          .join("");
+
+        // UI setup
+        document.getElementById("submitBtn").innerText = texts[lang].submit;
+        document.getElementById("tryBtn").innerText = texts[lang].tryAnother;
+        document.getElementById("homeBtn").innerText = texts[lang].home;
+        document.getElementById("viewAnswerBtn").innerText =
+          texts[lang].viewAnswer;
+        document.getElementById("resultButtons").classList.add("hidden");
+        document.getElementById("submitBtn").classList.remove("hidden");
+      }
+
+      function allowDrop(ev) {
+        ev.preventDefault();
+      }
+      function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+      }
+      function drop(ev) {
+        ev.preventDefault();
+        const data = ev.dataTransfer.getData("text");
+        ev.target.textContent = document.getElementById(data).textContent;
+      }
+
+      function normalizeDigit(c) {
+        const arabicToEng = {
+          "٠": "0",
+          "١": "1",
+          "٢": "2",
+          "٣": "3",
+          "٤": "4",
+          "٥": "5",
+          "٦": "6",
+          "٧": "7",
+          "٨": "8",
+          "٩": "9",
+        };
+        return arabicToEng[c] || c;
+      }
+
+      function checkAnswer() {
+        if (!hiddenSlots.length) return;
+
+        const numbers = { num1: "", num2: "", answer: "" };
+        const drops = document.querySelectorAll(".drop-zone");
+
+        hiddenSlots.forEach((slot, i) => {
+          const val = drops[i].textContent.trim() || slot.digit;
+          numbers[slot.part] += normalizeDigit(val);
+        });
+
+        ["num1", "num2", "answer"].forEach((part) => {
+          const original = correctAnswer[part].toString();
+          const hiddenDigits = numbers[part].split("");
+          let reconstructed = "";
+          let hiddenIdx = 0;
+
+          for (let i = 0; i < original.length; i++) {
+            const isHidden = hiddenSlots.some(
+              (h) =>
+                h.part === part &&
+                h.digit === original[i] &&
+                hiddenIdx < hiddenDigits.length
+            );
+            if (isHidden) {
+              reconstructed += hiddenDigits[hiddenIdx++];
+            } else {
+              reconstructed += original[i];
+            }
+          }
+
+          numbers[part] = reconstructed;
+        });
+
+        const n1 = parseInt(numbers.num1, 10);
+        const n2 = parseInt(numbers.num2, 10);
+        const nAns = parseInt(numbers.answer, 10);
+
+        let valid = false;
+        switch (currentOperation) {
+          case "+":
+            valid = n1 + n2 === nAns;
+            break;
+          case "-":
+            valid = n1 - n2 === nAns;
+            break;
+          case "*":
+            valid = n1 * n2 === nAns;
+            break;
+          case "/":
+            if (n2 !== 0) {
+              valid = n1 / n2 === nAns || n1 === n2 * nAns;
+            }
+            break;
+        }
+
+        drops.forEach((d) => d.classList.remove("correct", "wrong"));
+        if (valid) {
+          drops.forEach((d) => d.classList.add("correct"));
+        } else {
+          drops.forEach((d, i) => {
+            const actual = normalizeDigit(d.textContent.trim());
+            const expected = hiddenSlots[i] ? hiddenSlots[i].digit : null;
+            d.classList.add(
+              expected && actual === expected ? "correct" : "wrong"
+            );
+          });
+        }
+
+        document.getElementById("resultButtons").classList.remove("hidden");
+        document.getElementById("submitBtn").classList.add("hidden");
+      }
+
+      function tryAgain() {
+        generateQuestion();
+      }
+      function goHome() {
+        document.getElementById("gamePage").classList.add("hidden");
+        document.getElementById("operationPage").classList.remove("hidden");
+      }
+      function viewAnswer() {
+        const { num1, num2, answer } = correctAnswer;
+        const n1 = lang === "ar" ? toArabicDigit(num1) : num1;
+        const n2 = lang === "ar" ? toArabicDigit(num2) : num2;
+        const ans = lang === "ar" ? toArabicDigit(answer) : answer;
+        const directionStyle = lang === "ar" ? "direction:ltr;" : "";
+        document.getElementById(
+          "question"
+        ).innerHTML = `<div style="${directionStyle}">${n1}</div>
      <div style="${directionStyle}">${currentOperation} ${n2}</div>
      <div class="operation-line"></div>
      <div style="${directionStyle}">${ans}</div>`;
-}
-</script>
-</body>
+      }
+    </script>
+  </body>
 </html>
